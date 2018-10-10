@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/cyc/usr/projects/Clion/c++projects/lab1/main.cpp
+iostream
+-
+stack.h
+/home/cyc/usr/projects/Clion/c++projects/lab1/stack.h
+
+/home/cyc/usr/projects/Clion/c++projects/lab1/stack.cpp
+malloc.h
+-
+stack.h
+/home/cyc/usr/projects/Clion/c++projects/lab1/stack.h
+
+/home/cyc/usr/projects/Clion/c++projects/lab1/stack.h
+
