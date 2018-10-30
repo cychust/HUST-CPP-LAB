@@ -87,6 +87,9 @@
 		<Unit filename="/home/cyc/usr/projects/Clion/c++projects/lab1/main.cpp">
 			<Option target="lab1"/>
 		</Unit>
+		<Unit filename="/home/cyc/usr/projects/Clion/c++projects/lab1/test.cpp">
+			<Option target="lab1"/>
+		</Unit>
 		<Unit filename="/home/cyc/usr/projects/Clion/c++projects/lab1/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
