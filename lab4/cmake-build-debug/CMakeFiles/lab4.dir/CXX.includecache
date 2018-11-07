@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/cyc/usr/projects/Clion/c++projects/lab4/STACK.cpp
+STACK.h
+/home/cyc/usr/projects/Clion/c++projects/lab4/STACK.h
+
+/home/cyc/usr/projects/Clion/c++projects/lab4/STACK.h
+iostream
+-
+cstring
+-
+
+/home/cyc/usr/projects/Clion/c++projects/lab4/main.cpp
+iostream
+-
+STACK.h
+/home/cyc/usr/projects/Clion/c++projects/lab4/STACK.h
+
