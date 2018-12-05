@@ -1,1 +1,0 @@
-/usr/bin/c++  -g   CMakeFiles/DP.dir/main.cpp.o CMakeFiles/DP.dir/Matrix.cpp.o CMakeFiles/DP.dir/optionalBST.cpp.o  -o DP 
