@@ -37,7 +37,8 @@ int QUEUE::full() const {
 }
 
 int QUEUE::operator[](int x) const {
-    if (x > int()) {
+    if (x > QUEUE::operator int()) {
+        std::cout << int();
         std::cout << "error" << std::endl;
         return -1;
     }
@@ -45,7 +46,7 @@ int QUEUE::operator[](int x) const {
         return STACK::operator[](x);
     }
     if (s2 > x) {
-        return s2[s2 - x + 1];
+        return s2[s2 - x - 1];
     } else {
         STACK::operator[](x - s2);
     }
@@ -94,7 +95,7 @@ QUEUE &QUEUE::operator=(const QUEUE &s) {
 void QUEUE::print() const {
     if (s2 != 0) {
 ////        s2.print();
-        for (int i = s2-1; i >= 0; --i) {
+        for (int i = s2 - 1; i >= 0; --i) {
             std::cout << s2[i] << "  ";
         }
     }
@@ -109,6 +110,12 @@ void QUEUE::print() const {
 
 QUEUE::~QUEUE() {}
 
+
+bool isPrime(int n){
+    if (n){
+
+    }
+}
 int main(int argc, char *argv[]) {
 
     if (argc == 1) {
@@ -116,8 +123,8 @@ int main(int argc, char *argv[]) {
     } else {
         FILE *fp;
         int err;
-        char filename[20] = {'\0'};
-        strcat(filename, "cyc");
+        char filename[100] = {'\0'};
+        strcat(filename, argv[0]);
         strcat(filename, ".txt");
         std::cout << filename << " " << std::endl;
         if ((fp = fopen(filename, "w")) == NULL) {
@@ -180,10 +187,10 @@ int main(int argc, char *argv[]) {
                 }
                 if (flag == 0) {
                     pQueue->print();
-//                    if (err == 0)
-//                        for (int j = 0; j < *pQueue; ++j) {
-//                            fprintf(fp, "%d  ", (*pQueue)[j]);
-//                        }
+                    if (err == 0)
+                        for (int j = 0; j < *pQueue; ++j) {
+                            fprintf(fp, "%d  ", (*pQueue)[j]);
+                        }
                 } else
                     break;
                 i--;
@@ -208,10 +215,10 @@ int main(int argc, char *argv[]) {
                         *pQueue >> tmp2;
                     }
                     pQueue->print();
-//                    if (err == 0)
-//                        for (int j = 0; j < *pQueue; ++j) {
-////                            fprintf(fp, "%d  ", (*pQueue)[j]);
-//                        }
+                    if (err == 0)
+                        for (int j = 0; j < *pQueue; ++j) {
+                            fprintf(fp, "%d  ", (*pQueue)[j]);
+                        }
                 } else {
                     printf("E  ");
                     fprintf(fp, "E  ");
@@ -251,7 +258,7 @@ int main(int argc, char *argv[]) {
                 fprintf(fp, "N  ");
                 int n = *pQueue;
                 fprintf(fp, "%d  ", n);
-                printf("%d", n);
+                printf("%d  ", n);
             }
             if (!strcmp(argv[i], "-G")) {
                 printf("G  ");
