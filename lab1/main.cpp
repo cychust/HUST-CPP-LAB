@@ -7,6 +7,7 @@
 
 int pid[2];
 int fd[2];
+
 void handle(int signum) {
     if (signum == SIGINT) {
         kill(pid[0], SIGUSR1);
@@ -32,8 +33,15 @@ void handle2(int signum) {
     }
 }
 
+void alarmHandle(int signum) {
+    if (signum == SIGALRM) {
+        kill(pid[0], SIGUSR1);
+        kill(pid[1], SIGUSR2);
+    }
+}
+
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+//    std::cout << "Hello, World!" << std::endl;
     int n;
 //    int fd[2];
     pid_t pid1;
@@ -45,7 +53,9 @@ int main() {
     std::string message;
     std::string x_str;
     signal(SIGINT, handle);
-    pipe(fd);                     //创建管道
+    pipe(fd);//创建管道
+    alarm(5);
+    signal(SIGALRM, alarmHandle);
     if ((pid1 = fork()) == -1) {   //子进程
         exit(1);
     }
@@ -80,7 +90,7 @@ int main() {
         }
     }
     pid[1] = pid2;
-    std::cout << pid[0] << " " << pid[1] << std::endl;
+//    std::cout << pid[0] << " " << pid[1] << std::endl;
     waitpid(pid[0], NULL, 0);
     waitpid(pid[1], NULL, 0);
     close(fd[0]);
