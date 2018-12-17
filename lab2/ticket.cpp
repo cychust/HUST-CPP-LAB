@@ -1,7 +1,7 @@
 //
 // Created by cyc on 18-12-10.
 //
-
+#include "iomanip"
 #include <iostream>
 
 #include <pthread.h>
@@ -10,7 +10,7 @@
 #include <sys/ipc.h>
 #include <zconf.h>
 
-#define N 10
+#define N 5
 union semun {
     int val; /* value for SETVAL */
     struct semid_ds *buf; /* buffer for IPC_STAT, IPC_SET */
@@ -56,7 +56,9 @@ void *sellHandle(void *a) {
             break;
         }
         sell++;
-        std::cout << "thread " << t->id << " sell:" << "total sell is" << sell << std::endl;
+        std::cout << "线程 " << std::right << std::setw(2)
+                  << t->id << " 售票:"
+                  << "一共已卖 " << std::right << std::setw(3) << sell << std::endl;
         V(t->semId, 0);
         srand((unsigned) time(NULL));
         usleep(rand() % 100);
@@ -99,7 +101,7 @@ int main() {
     }
     for (int j = 0; j < N; ++j) {
         pthread_join(thread[j], &a1[j]);
-        std::cout << "join" << j + 1 << std::endl;
+        std::cout << "线程" << j + 1 << "退出" << std::endl;
     }
     std::cout << "main" << std::endl;
     return 0;

@@ -5,6 +5,7 @@
 #include <sys/sem.h>
 #include <sys/ipc.h>
 #include <zconf.h>
+#include <iomanip>
 
 union semun {
     int val; /* value for SETVAL */
@@ -42,6 +43,7 @@ void *handle1(void *a) {
     struct thread_para *t = (struct thread_para *) a;
     while (i <= 100) {
         P(t->semId, 0);
+        std::cout << "线程１计算，加" << i << std::endl;
         t->a += i;
         i++;
         V(t->semId, 1);
@@ -55,25 +57,23 @@ void *handle2(void *a) {
     struct thread_para *t = (struct thread_para *) a;
     while (!t->flag) {
         P(t->semId, 1);
-        std::cout << t->a << std::endl;
+        std::cout << "和为" << std::right << std::setw(5) << t->a << std::endl;
         V(t->semId, 0);
     }
 }
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
-
     union semun arg;
-//    struct sembuf semop;
     int semId;
-    int key;
+    key_t key;
     int ret;
     int a = 0;
     struct thread_para para;                     //子线程参数
     pthread_t thread1;
     pthread_t thread2;
     void *a1, *a2;
-    key = ftok("/tmp", 0x66);
+//    key = IPC_PRIVATE;
+    key = ftok("/tmp", 0x1);                 //生成IPC键值
     if (key < 0) {
         perror("ftok key error");
         return -1;
@@ -105,9 +105,10 @@ int main() {
     pthread_create(&thread2, NULL, handle2, &para);
 
     pthread_join(thread1, &a1);
-    std::cout << "1" << std::endl;
+    std::cout << "线程 1 退出" << std::endl;
     pthread_join(thread2, &a2);
-    std::cout << "2" << std::endl;
-    std::cout << "main" << std::endl;
+    std::cout << "线程 2 退出" << std::endl;
+    semctl(semId, 2, IPC_RMID);
+    std::cout << "主线程退出" << std::endl;
     return 0;
 }
