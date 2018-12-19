@@ -72,7 +72,6 @@ int main() {
     pthread_t thread1;
     pthread_t thread2;
     void *a1, *a2;
-//    key = IPC_PRIVATE;
     key = ftok("/tmp", 0x1);                 //生成IPC键值
     if (key < 0) {
         perror("ftok key error");
