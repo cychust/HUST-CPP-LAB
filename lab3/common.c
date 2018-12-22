@@ -29,7 +29,12 @@ int createKey() {
         perror("ftok error");
         exit(-1);
     }
-    key2 = ftok(PATHNAME, PROJID2);
+    key1 = ftok(PATHNAME, PROJID2);
+    if (key1 < 0) {
+        perror("ftok error");
+        exit(-1);
+    }
+    key2 = ftok(PATHNAME, PROJID3);
     if (key2 < 0) {
         perror("ftok error");
         exit(-1);
@@ -80,19 +85,19 @@ int createMutex() {
     }
     arg.val = 1;                                  //信号灯 　初值为1;
     for (int i = 0; i < N; ++i) {                   //对写信号灯组进行初始化
-        ret = semctl(semId, i, SETVAL, arg);
+        ret = semctl(semId1, i, SETVAL, arg);
         if (ret < 0) {
             perror("ctl sem error");
-            semctl(semId, i, IPC_RMID, arg);
+            semctl(semId1, i, IPC_RMID, arg);
             exit(-1);
         }
     }
     arg.val = 0;                                  //信号灯 　初值为0;
     for (int j = 0; j < N; ++j) {                   //对读信号灯组初始化
-        ret = semctl(semId, j, SETVAL, arg);
+        ret = semctl(semId2, j, SETVAL, arg);
         if (ret < 0) {
             perror("ctl sem error");
-            semctl(semId, j, IPC_RMID, arg);
+            semctl(semId2, j, IPC_RMID, arg);
             exit(-1);
         }
     }

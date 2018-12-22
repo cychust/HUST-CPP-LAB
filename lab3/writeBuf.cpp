@@ -13,19 +13,20 @@ int main() {
     int result;
     FILE *pFile;
     int size;
-    pFile = fopen("./my", "rb");
+    pFile = fopen("out.txt", "wb");
     if (pFile == NULL) {
         perror("Error when open file");
         exit(-1);
     }
     while (1) {
-        p1(outPointer);
-        result = fwrite(buf[inPointer], sizeof(char), sizeof(buf[outPointer]), pFile);
-        v1(outPointer);
+        p2(outPointer);
+        result = fwrite(buf[outPointer], sizeof(char), sizeof(buf[outPointer]), pFile);
+        std::cout << "writeBuf" << result << std::endl;
+        v2(outPointer);
         outPointer = (outPointer + 1) % N;
         if (result != SIZE) {
             if (ferror(pFile)) {
-                perror("error when read file");
+                perror("error when write file");
                 exit(-1);
             } else {
                 break;

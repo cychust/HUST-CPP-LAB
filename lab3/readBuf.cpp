@@ -13,7 +13,7 @@ int main() {
     int result;
     FILE *pFile;
     int size;
-    pFile = fopen("./", "rb");
+    pFile = fopen("in.txt", "rb");
     if (pFile == NULL) {
         perror("Error when open file");
         exit(-1);
@@ -21,6 +21,7 @@ int main() {
     while (1) {
         p1(inPointer);
         result = fread(buf[inPointer], 1, SIZE, pFile);
+        std::cout << "read" << result << std::endl;
         v1(inPointer);
         inPointer = (inPointer + 1) % N;
         if (result != SIZE) {
