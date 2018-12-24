@@ -13,21 +13,27 @@
 #include <zconf.h>
 #include <iomanip>
 #include <stdlib.h>
-
+#include <string.h>
 
 #define PATHNAME "/tmp"
 #define PROJID1  0X1
 #define PROJID2  0X2
 #define PROJID3  0X3
-#define SIZE 1024*4    //4k
+#define SIZE 1024    //4k
 #define N 4
 
-key_t key;
+typedef struct ShareBuf{
+    char buf[SIZE];
+    int length;
+}ShareBuf;
+
+key_t key[N];
 key_t key1;
 key_t key2;
 int semId1;
 int semId2;
 int shmid[N];
+ShareBuf *buf[N];
 
 union semun {
     int val; /* value for SETVAL */
@@ -35,28 +41,6 @@ union semun {
     unsigned short *array; /* array for GETALL, SETALL */
     struct seminfo *__buf; /* buffer for IPC_INFO */
 };
-
-char *buf[N];
-
-//int commonMem(int flags);
-//
-//int createMem();
-//
-//int createMutex();
-//
-//int getMem();
-//
-//int destroyMem(int shmid);
-//
-//int destroyMutex(int semId);
-//
-//void p1(int semnum);
-//
-//void p2(int semnum);
-//
-//void v1(int semnum);
-//
-//void v2(int semnum);
 
 
 void P(int semId, int semNum) {
@@ -78,10 +62,12 @@ void V(int semId, int semNum) {
 }
 
 int createKey() {
-    key = ftok(PATHNAME, PROJID1);
-    if (key < 0) {
-        perror("ftok error");
-        exit(-1);
+    for (int i = 0; i < N; ++i) {
+        key[i] = ftok(PATHNAME, i + 100);
+        if (key[i] < 0) {
+            perror("ftok error");
+            exit(-1);
+        }
     }
     key1 = ftok(PATHNAME, PROJID2);
     if (key1 < 0) {
@@ -100,65 +86,65 @@ int createKey() {
 
 int commonMem(int flags) {
     for (int i = 0; i < N; ++i) {
-        shmid[i] = shmget(key, SIZE * sizeof(char), flags);
+        shmid[i] = shmget(key[i], sizeof(ShareBuf), flags);
         if (shmid[i] < 0) {
-            std::cout<<"end"<<std::endl;
+            std::cout << "end" << std::endl;
             perror("shmget error");
-            std::cout<<"end"<<std::endl;
+            std::cout << "end" << std::endl;
             exit(-1);
         }
-        printf("shmid is %d", shmid[i]);
-        buf[i] = (char *) shmat(shmid[i], 0, 0);
+//        printf("shmid is %d", shmid[i]);
+        buf[i] = (ShareBuf *) shmat(shmid[i], NULL, 0);
+        memset(buf[i], '\0', SIZE);
     }
-
     return 0;
 }
 
+
 void p1(int semnum) {
-    P(semId1, semnum);
     std::cout << "p1 " << semnum << std::endl;
+    P(semId1, semnum);
 }
 
 void p2(int semnum) {
-    std::cout << "p2 " << semnum << std::endl;
+//    std::cout << "p2 " << semnum << std::endl;
     P(semId2, semnum);
 }
 
 void v1(int semnum) {
-    std::cout << "v1 " << semnum << std::endl;
     V(semId2, semnum);
 }
 
 void v2(int semnum) {
-    std::cout << "v2 " << semnum << std::endl;
     V(semId1, semnum);
 }
 
-int createMutex() {
-    union semun arg1[N];
-    union semun arg2[N];
+int createMutex(int flags) {
+    union semun arg;
+//    union semun arg2[N];
     int ret;
-    semId1 = semget(key1, N, IPC_CREAT | 0666);   //写信号灯组
-    semId2 = semget(key2, N, IPC_CREAT | 0666);   //读信号灯组
+    semId1 = semget(key1, N, flags);   //写信号灯组
+    semId2 = semget(key2, N, flags);   //读信号灯组
     if (semId1 == -1 || semId2 == -1) {
         perror("create semget error");
         exit(-1);
     }
     for (int i = 0; i < N; ++i) {                   //对写信号灯组进行初始化
-        arg1[i].val = 1;                                  //信号灯 　初值为1;
-        ret = semctl(semId1, i, SETVAL, arg1[i]);
+        arg.val = 1;                                  //信号灯 　初值为1;
+        ret = semctl(semId1, i, SETVAL, arg);
+//        std::cout << "set" << SETVAL << std::endl;
         if (ret < 0) {
             perror("ctl sem error");
-            semctl(semId1, i, IPC_RMID, arg1[i]);
+            semctl(semId1, i, IPC_RMID, arg);
             exit(-1);
         }
     }
     for (int j = 0; j < N; ++j) {                   //对读信号灯组初始化
-        arg2[j].val = 0;                                  //信号灯 　初值为0;
-        ret = semctl(semId2, j, SETVAL, arg2[j]);
+        arg.val = 0;                                  //信号灯 　初值为0;
+        ret = semctl(semId2, j, SETVAL, arg);
         if (ret < 0) {
             perror("ctl sem error");
-            semctl(semId2, j, IPC_RMID, arg2[j]);
+            semctl(semId2, j, IPC_RMID, arg);
             exit(-1);
         }
     }
@@ -166,11 +152,11 @@ int createMutex() {
 
 
 int createMem() {
-    return commonMem(IPC_CREAT | IPC_EXCL | 0666);
+    return commonMem(IPC_CREAT | 0666);
 }
 
 
-int destroyMem(int *shmid) {
+int destroyMem() {
     for (int i = 0; i < N; ++i) {
         if (shmctl(shmid[i], IPC_RMID, NULL) < 0) {
             perror("destroy error");
@@ -186,6 +172,12 @@ int destroyMutex(int semId) {
     for (int i = 0; i < N; ++i) {
         semctl(semId, i, IPC_RMID, arg);
     }
+}
+
+void destroy() {
+    destroyMutex(semId1);
+    destroyMutex(semId2);
+    destroyMem();
 }
 
 #endif //LAB3_COMMON_H
