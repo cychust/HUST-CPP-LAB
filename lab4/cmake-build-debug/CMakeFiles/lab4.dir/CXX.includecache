@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/cyc/usr/projects/Clion/os/lab4/main.cpp
+iostream
+-
+sys/types.h
+-
+sys/stat.h
+-
+dirent.h
+-
+time.h
+-
+pwd.h
+-
+grp.h
+-
+cstring
+-
+zconf.h
+-
+
