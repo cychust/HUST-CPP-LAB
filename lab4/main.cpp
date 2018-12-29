@@ -124,7 +124,7 @@ void displayFile(char *pathName, int lFlags) {
 }
 
 void displayDir(char *fileName, const char *dirName) {
-    std::list<dirent *> direntpList;
+    std::list<dirent *> direntpList;                  //存储本目录下的文件,等待输出
     DIR *dir;
     struct dirent *direntp;
     struct stat buf;
@@ -134,13 +134,13 @@ void displayDir(char *fileName, const char *dirName) {
         perror("error");
         return;
     }
-    chdir(fileName);
+    chdir(fileName);                                 //进入文件夹内
     while ((direntp = readdir(dir)) != NULL) {
         if (lstat(direntp->d_name, &buf) < 0) {
             perror("sss");
         }
         if (S_ISDIR(buf.st_mode)) {
-            if (strcmp(direntp->d_name, "..") == 0 || strcmp(direntp->d_name, ".") == 0)
+            if (strcmp(direntp->d_name, "..") == 0 || strcmp(direntp->d_name, ".") == 0)        //跳过.和..的文件
                 continue;
             displayFile(direntp->d_name, 0);
             direntpList.push_back(direntp);
@@ -153,7 +153,7 @@ void displayDir(char *fileName, const char *dirName) {
         displayDir((*itr)->d_name, dirN.data());
         std::cout << std::endl;
     }
-    chdir("..");
+    chdir("..");            //返回上一层目录
     closedir(dir);
 }
 
