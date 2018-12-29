@@ -33,11 +33,12 @@
 
 //---------------------------------------------------------------------------------
 
-void displayFile(char *pathName) {
+void displayFile(char *pathName, int lFlags) {
     struct stat buf;
     struct tm *time;
     char filemode[11];
     char symlink[100];
+    std::ios::fmtflags flag(std::cout.flags());              //save old format
     if (lstat(pathName, &buf) < 0) {
         perror("lstat error");
         return;
@@ -87,32 +88,41 @@ void displayFile(char *pathName) {
         }
         i++;
     }
-    time = localtime(&buf.st_mtime);
+    time = localtime(&buf.st_mtime);            //文件内容部分修改时间
     filemode[10] = '\0';
-    std::cout << filemode << "  ";
-    std::cout << buf.st_nlink << "  ";
-    std::cout << std::setw(4) << std::setfill(' ') << getpwuid(buf.st_uid)->pw_name << "  ";
-    std::cout << std::setw(4) << getgrgid(buf.st_gid)->gr_name << "  ";
-    if (filemode[0] == 'b' || filemode[0] == 'c')
-        std::cout << (buf.st_rdev >> 8) << " " << (buf.st_rdev & 0xff);
-    else
-        std::cout << std::setw(7) << std::right << buf.st_size << "   ";
-    std::cout << time->tm_year + 1900 << "-" << time->tm_mon + 1 << "-" << time->tm_mday << "  ";   //时间
+    if (!lFlags) {
+        std::cout << filemode << "  ";
+        std::cout << buf.st_nlink << "  ";
+        std::cout << std::setw(4) << std::setfill(' ') << getpwuid(buf.st_uid)->pw_name << "  ";
+        std::cout << std::setw(4) << getgrgid(buf.st_gid)->gr_name << "  ";
+        if (filemode[0] == 'b' || filemode[0] == 'c')                              //块设备信息或字符设备
+            std::cout << (buf.st_rdev >> 8) << " " << (buf.st_rdev & 0xff);         //主设备号　次设备号
+        else
+            std::cout << std::setw(7) << std::right << buf.st_size << "   ";
+        std::cout << time->tm_year + 1900 << "-" << time->tm_mon + 1 << "-" << time->tm_mday << "  ";   //时间
 
-    std::cout << std::setw(2) << std::setfill('0') << time->tm_hour             //时间
-              << ":"
-              << std::setw(2) << time->tm_min << "  ";
+        std::cout << std::setw(2) << std::setfill('0') << time->tm_hour             //时间
+                  << ":"
+                  << std::setw(2) << time->tm_min << "  ";
+    }
     if (filemode[0] == 'l') {
         memset(symlink, '\0', sizeof(symlink));
-        std::cout << pathName;
+        std::cout << BOLDBLUE << pathName << RESET << " -> ";
         if (readlink(pathName, symlink, sizeof(symlink)) > 0) {
             symlink[strlen(symlink)] = '\0';
-            std::cout << " -> " << symlink;
+            displayFile(symlink, 1);
         }
+    } else if (filemode[0] == 'd') {
+        std::cout << BOLDRED << pathName << '/' << RESET;
     } else {
-        std::cout << pathName;
+        if (filemode[3] == 'x') {
+            std::cout << BOLDGREEN << pathName << RESET << "*";
+        } else {
+            std::cout << pathName;
+        }
     }
     std::cout << std::endl;
+
 //    else
 //        std::cout<<
 }
@@ -136,10 +146,10 @@ void displayDir(char *fileName, const char *dirName) {
         if (S_ISDIR(buf.st_mode)) {
             if (strcmp(direntp->d_name, "..") == 0 || strcmp(direntp->d_name, ".") == 0)
                 continue;
-            displayFile(direntp->d_name);
+            displayFile(direntp->d_name, 0);
             direntpList.push_back(direntp);
         } else
-            displayFile(direntp->d_name);
+            displayFile(direntp->d_name, 0);
     }
     std::cout << std::endl;
     for (std::list<dirent *>::iterator itr = direntpList.begin(); itr != direntpList.end(); itr++) {
@@ -161,7 +171,7 @@ int main(int argc, char *argv[]) {
         if (S_ISDIR(buf.st_mode)) {
             displayDir(argv[i], argv[i]);
         } else {
-            displayFile(argv[i]);
+            displayFile(argv[i], 0);
         }
     }
     return 0;
