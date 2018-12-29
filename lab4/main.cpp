@@ -113,18 +113,14 @@ void displayFile(char *pathName, int lFlags) {
             displayFile(symlink, 1);
         }
     } else if (filemode[0] == 'd') {
-        std::cout << BOLDRED << pathName << '/' << RESET;
+        std::cout << BOLDRED << pathName << '/' << RESET << std::endl;
     } else {
         if (filemode[3] == 'x') {
-            std::cout << BOLDGREEN << pathName << RESET << "*";
+            std::cout << BOLDGREEN << pathName << RESET << "*" << std::endl;
         } else {
-            std::cout << pathName;
+            std::cout << pathName << std::endl;
         }
     }
-    std::cout << std::endl;
-
-//    else
-//        std::cout<<
 }
 
 void displayDir(char *fileName, const char *dirName) {
