@@ -1,0 +1,3 @@
+/home/cyc/usr/projects/Clion/os/copy/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/cyc/usr/projects/Clion/os/copy/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/cyc/usr/projects/Clion/os/copy/cmake-build-debug/CMakeFiles/copy.dir
